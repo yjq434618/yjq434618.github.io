@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Museum of Computer Culture</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0e1a;
+  --bg2: #111827;
+  --card: #1a2235;
+  --accent: #00e5a0;
+  --accent2: #4dabf7;
+  --text: #e6edf3;
+  --muted: #8b98a5;
+  --border: #2a3548;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* ===== Nav ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,14,26,.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+nav .logo { font-weight: 700; color: var(--accent); letter-spacing: 1px; font-size: 15px; }
+nav ul { display: flex; gap: 18px; list-style: none; }
+nav a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color .2s; }
+nav a:hover { color: var(--accent); }
+@media (max-width: 900px) { nav ul { display: none; } }
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 80px 20px 40px;
+  background: radial-gradient(circle at 50% 30%, #16213a 0%, var(--bg) 70%);
+  position: relative;
+}
+.hero h1 {
+  font-size: clamp(28px, 7vw, 56px);
+  letter-spacing: 4px; margin-bottom: 16px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero .sub { color: var(--muted); font-size: clamp(13px, 3.5vw, 17px); max-width: 620px; }
+.typewriter {
+  margin-top: 28px; font-family: "Courier New", monospace;
+  color: var(--accent); font-size: clamp(13px, 3vw, 16px);
+  min-height: 26px; white-space: pre-wrap;
+}
+.typewriter::after { content: "_"; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.btn {
+  margin-top: 36px; padding: 12px 34px;
+  background: transparent; border: 1px solid var(--accent);
+  color: var(--accent); border-radius: 30px; cursor: pointer;
+  font-size: 15px; letter-spacing: 2px; transition: all .3s;
+}
+.btn:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 24px rgba(0,229,160,.4); }
+
+/* ===== Sections ===== */
+section { padding: 70px 20px; max-width: 1000px; margin: 0 auto; }
+.sec-title { font-size: clamp(20px, 5vw, 30px); margin-bottom: 8px; color: var(--accent); }
+.sec-desc { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+.tag { display: inline-block; font-size: 11px; color: var(--accent2); border: 1px solid var(--border); padding: 2px 10px; border-radius: 12px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;}
+
+/* ===== Reveal ===== */
+.reveal { opacity: 0; transform: translateY(36px); transition: all .7s ease; }
+.reveal.show { opacity: 1; transform: none; }
+
+/* ===== Timeline ===== */
+.timeline { position: relative; padding-left: 26px; }
+.timeline::before {
+  content: ""; position: absolute; left: 6px; top: 6px; bottom: 6px;
+  width: 2px; background: linear-gradient(var(--accent), var(--accent2));
+}
+.t-item { position: relative; margin-bottom: 18px; }
+.t-item::before {
+  content: ""; position: absolute; left: -26px; top: 8px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent);
+}
+.t-head {
+  cursor: pointer; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 18px; transition: all .25s;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.t-head:hover { border-color: var(--accent); transform: translateX(4px); }
+.t-head .year { color: var(--accent); font-weight: 700; font-family: monospace; min-width: 80px;}
+.t-head .name { flex: 1; font-size: 15px; }
+.t-head .arrow { color: var(--muted); transition: transform .3s; }
+.t-item.open .arrow { transform: rotate(90deg); }
+.t-body {
+  max-height: 0; overflow: hidden; transition: max-height .4s ease;
+  background: var(--bg2); border-radius: 0 0 10px 10px;
+}
+.t-item.open .t-body { max-height: 400px; }
+.t-body p { padding: 16px 18px; font-size: 14px; color: var(--muted); }
+
+/* ===== Cards ===== */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px; transition: all .3s;
+}
+.card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 12px 30px rgba(0,0,0,.4); }
+.card .icon {
+  width: 46px; height: 46px; border-radius: 10px; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(0,229,160,.15), rgba(77,171,247,.15));
+  font-size: 22px;
+}
+.card h3 { font-size: 16px; margin-bottom: 8px; }
+.card p { font-size: 13px; color: var(--muted); }
+
+/* ===== Flip Cards ===== */
+.flip { perspective: 1000px; height: 190px; cursor: pointer; }
+.flip-inner { position: relative; width: 100%; height: 100%; transition: transform .6s; transform-style: preserve-3d; }
+.flip.on .flip-inner { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: 14px; padding: 20px; display: flex;
+  flex-direction: column; align-items: center; justify-content: center; text-align: center;
+}
+.flip-front { background: var(--card); border: 1px solid var(--border); }
+.flip-back { background: linear-gradient(135deg, #14324a, #1a2235); border: 1px solid var(--accent2); transform: rotateY(180deg); }
+.flip-back p { font-size: 13px; color: var(--text); }
+.flip-front h3 { color: var(--accent); font-size: 17px; }
+.flip-front span { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* ===== Stats ===== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 16px; text-align: center; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 12px; }
+.stat .num { font-size: clamp(24px,6vw,36px); font-weight: 700; color: var(--accent); font-family: monospace; }
+.stat .label { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+/* ===== Quiz ===== */
+.quiz { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px; }
+.q { margin-bottom: 26px; }
+.q h4 { font-size: 15px; margin-bottom: 14px; }
+.opt {
+  display: block; width: 100%; text-align: left; margin-bottom: 10px;
+  padding: 11px 16px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); cursor: pointer; font-size: 14px; transition: all .2s;
+}
+.opt:hover { border-color: var(--accent2); }
+.opt.right { border-color: var(--accent); background: rgba(0,229,160,.12); }
+.opt.wrong { border-color: #ff6b6b; background: rgba(255,107,107,.12); }
+#result { margin-top: 10px; text-align: center; font-size: 16px; color: var(--accent); min-height: 26px; }
+
+footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">◈ DIGITAL MUSEUM OF COMPUTER CULTURE</div>
+  <ul>
+    <li><a href="#hall1">The Dawn</a></li>
+    <li><a href="#hall2">Electronic Era</a></li>
+    <li><a href="#hall3">PC & Internet</a></li>
+    <li><a href="#hall4">Smart Era</a></li>
+    <li><a href="#culture">Culture Corner</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <h1>Digital Museum of Computer Culture</h1>
+  <p class="sub">From the Abacus to Artificial Intelligence: A 4,000-Year Journey of Computing Civilization</p>
+  <div class="typewriter" id="tw"></div>
+  <button class="btn" onclick="document.getElementById('hall1').scrollIntoView()">START TOUR</button>
+</header>
+
+<!-- Hall 1 -->
+<section id="hall1" class="reveal">
+  <span class="tag">Hall 1</span>
+  <h2 class="sec-title">The Dawn of Computing</h2>
+  <p class="sec-desc">Long before electricity, humans were already thinking about "how to calculate." Click on the years to expand details.</p>
+  <div class="timeline">
+    <div class="t-item">
+      <div class="t-head"><span class="year">c. 2400 BC</span><span class="name">The Abacus</span><span class="arrow">▶</span></div>
+      <div class="t-body"><p>One of humanity's earliest calculating tools. By representing values through the position of beads, it is still used in some commercial settings today and is hailed as "the world's oldest computer."</p></div>
+    </div>
+    <div class="t-item">
+      <div class="t-head"><span class="year">1642</span><span class="name">Pascal's Calculator</span><span class="arrow">▶</span></div>
+      <div class="t-body"><p>Built by 19-year-old Blaise Pascal to help his father calculate taxes, it was the world's first mechanical adding machine, utilizing a gear-driven carry mechanism.</p></div>
+    </div>
+    <div class="t-item">
+      <div class="t-head"><span class="year">1837</span><span class="name">Babbage's Analytical Engine</span><span class="arrow">▶</span></div>
+      <div class="t-body"><p>A general-purpose mechanical computer designed by Charles Babbage, featuring input, storage, processing, and output structures. Ada Lovelace wrote programs for it and is recognized as the world's first programmer.</p></div>
+    </div>
+    <div class="t-item">
+      <div class="t-head"><span class="year">1936</span><span class="name">The Turing Machine</span><span class="arrow">▶</span></div>
+      <div class="t-body"><p>An abstract computational model proposed by Alan Turing that defined the boundaries of "computability." It is the theoretical foundation of modern computer science, and the Turing Award is named after him.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Hall 2 -->
+<section id="hall2" class="reveal">
+  <span class="tag">Hall 2</span>
+  <h2 class="sec-title">The Electronic Computer Era</h2>
+  <p class="sec-desc">Vacuum tubes, transistors, and integrated circuits—three leaps that made machines smaller and faster.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>ENIAC (1946)</h3>
+      <p>The first general-purpose electronic digital computer. Weighing 30 tons and covering 167 square meters, it used 18,000 vacuum tubes and could perform 5,000 additions per second.</p>
+    </div>
+    <div class="card">
+      <div class="icon">◧</div>
+      <h3>The Transistor (1947)</h3>
+      <p>Invented at Bell Labs, it replaced bulky and fragile vacuum tubes, drastically reducing computer size and greatly improving reliability, ushering in the second generation of computers.</p>
+    </div>
+    <div class="card">
+      <div class="icon">▦</div>
+      <h3>Integrated Circuit (1958)</h3>
+      <p>Jack Kilby and Robert Noyce independently implemented the integration of multiple components onto a single semiconductor chip. Moore's Law took off, and computing power began to grow exponentially.</p>
+    </div>
+    <div class="card">
+      <div class="icon">▤</div>
+      <h3>IBM System/360 (1964)</h3>
+      <p>The first computer family to achieve software compatibility. It established the architectural paradigm of modern computers, an influence that persists today.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Hall 3 -->
+<section id="hall3" class="reveal">
+  <span class="tag">Hall 3</span>
+  <h2 class="sec-title">Personal Computers & The Internet</h2>
+  <p class="sec-desc">Computers moved from labs to desks, and from standalone machines to global connectivity.</p>
+  <div class="grid">
+    <div class="card"><div class="icon">🖥</div><h3>Apple II (1977)</h3><p>The first mass-market successful personal computer, allowing ordinary people to own a computer for the first time.</p></div>
+    <div class="card"><div class="icon">⌨</div><h3>IBM PC (1981)</h3><p>Its open architecture spawned the entire PC-compatible industry, establishing the dominance of the x86 ecosystem.</p></div>
+    <div class="card"><div class="icon">🪟</div><h3>Graphical User Interface</h3><p>Originating at Xerox PARC and popularized by Apple and Microsoft, the mouse and windows completely transformed human-computer interaction.</p></div>
+    <div class="card"><div class="icon">🌐</div><h3>World Wide Web (1989)</h3><p>Tim Berners-Lee proposed the WWW at CERN and made the standards freely available to all humanity.</p></div>
+  </div>
+</section>
+
+<!-- Hall 4 -->
+<section id="hall4" class="reveal">
+  <span class="tag">Hall 4</span>
+  <h2 class="sec-title">The Mobile & Intelligent Era</h2>
+  <p class="sec-desc">Computing power goes into pockets, data flows to the cloud, and machines begin to learn.</p>
+  <div class="stats">
+    <div class="stat"><div class="num" data-target="1991">0</div><div class="label">Public WWW Launch</div></div>
+    <div class="stat"><div class="num" data-target="2007">0</div><div class="label">Year of the Smartphone</div></div>
+    <div class="stat"><div class="num" data-target="2016">0</div><div class="label">AlphaGo Defeats Human</div></div>
+    <div class="stat"><div class="num" data-target="2022">0</div><div class="label">Era of Large Models Begins</div></div>
+  </div>
+  <div class="grid" style="margin-top:24px">
+    <div class="card"><div class="icon">📱</div><h3>Mobile Computing</h3><p>Smartphones make computing power an infrastructure available to everyone, everywhere.</p></div>
+    <div class="card"><div class="icon">☁</div><h3>Cloud Computing</h3><p>Computing power migrates from local devices to data centers, available on-demand and elastically scalable.</p></div>
+    <div class="card"><div class="icon">🧠</div><h3>Artificial Intelligence</h3><p>From symbolic reasoning to deep learning, machines begin to possess perception, generation, and decision-making capabilities.</p></div>
+  </div>
+</section>
+
+<!-- Culture -->
+<section id="culture" class="reveal">
+  <span class="tag">Culture Corner</span>
+  <h2 class="sec-title">Click cards to flip and learn</h2>
+  <p class="sec-desc">Beyond technology, there are people and their beliefs.</p>
+  <div class="grid">
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front"><h3>Open Source Spirit</h3><span>Click to flip</span></div>
+      <div class="flip-face flip-back"><p>Open source code, free to use, and collaborative improvement. Linux and the GNU Project proved that the best software can be built together by strangers.</p></div>
+    </div></div>
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front"><h3>Hacker Ethic</h3><span>Click to flip</span></div>
+      <div class="flip-face flip-back"><p>The original "hackers" were highly skilled and curious explorers who believed in free information, hands-on practice, and opposing authoritarian monopolies.</p></div>
+    </div></div>
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front"><h3>Geek Culture</h3><span>Click to flip</span></div>
+      <div class="flip-face flip-back"><p>A pure love for technology itself. From Star Trek to mechanical keyboards, from pixel art to the answer 42.</p></div>
+    </div></div>
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front"><h3>Classic Games</h3><span>Click to flip</span></div>
+      <div class="flip-face flip-back"><p>Spacewar!, Tetris, Super Mario—games are both a testing ground for technology and a shared memory for a generation.</p></div>
+    </div></div>
+  </div>
+</section>
+
+<!-- Quiz -->
+<section id="quiz" class="reveal">
+  <span class="tag">Final Hall</span>
+  <h2 class="sec-title">Museum Quiz</h2>
+  <p class="sec-desc">Test what you've learned during your visit.</p>
+  <div class="quiz">
+    <div class="q" data-a="1">
+      <h4>1. Who is recognized as the world's first computer programmer?</h4>
+      <button class="opt">Alan Turing</button>
+      <button class="opt">Ada Lovelace</button>
+      <button class="opt">Tim Berners-Lee</button>
+    </div>
+    <div class="q" data-a="2">
+      <h4>2. In which year was the World Wide Web (WWW) born?</h4>
+      <button class="opt">1976</button>
+      <button class="opt">1991</button>
+      <button class="opt">1989</button>
+    </div>
+    <div class="q" data-a="0">
+      <h4>3. What replaced vacuum tubes and initiated the second generation of computers?</h4>
+      <button class="opt">The Transistor</button>
+      <button class="opt">Integrated Circuit</button>
+      <button class="opt">Microprocessor</button>
+    </div>
+    <div id="result"></div>
+  </div>
+</section>
+
+<footer>
+  Digital Museum of Computer Culture · Individual Assignment · Built with pure HTML / CSS / JavaScript
+</footer>
+
+<script>
+/* Typewriter effect */
+const lines = [
+  "> Initializing museum system ...",
+  "> Loading exhibit data ... Done",
+  "> Welcome to the civilization of computing"
+];
+let li = 0, ci = 0, el = document.getElementById('tw');
+(function type() {
+  if (li >= lines.length) return;
+  el.textContent = lines[li].slice(0, ++ci);
+  if (ci < lines[li].length) setTimeout(type, 55);
+  else setTimeout(() => { li++; ci = 0; type(); }, 1400);
+})();
+
+/* Timeline expand */
+document.querySelectorAll('.t-head').forEach(h => {
+  h.onclick = () => h.parentElement.classList.toggle('open');
+});
+document.querySelector('.t-item').classList.add('open');
+
+/* Flip cards */
+document.querySelectorAll('.flip').forEach(f => {
+  f.onclick = () => f.classList.toggle('on');
+});
+
+/* Scroll reveal */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(n => io.observe(n));
+
+/* Number counting */
+const io2 = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const n = e.target, target = +n.dataset.target;
+    let cur = 1900;
+    const t = setInterval(() => {
+      cur += Math.ceil((target - cur) / 12) || 1;
+      n.textContent = cur;
+      if (cur >= target) { n.textContent = target; clearInterval(t); }
+    }, 30);
+    io2.unobserve(n);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.num').forEach(n => io2.observe(n));
+
+/* Quiz logic */
+let score = 0, done = 0;
+const total = document.querySelectorAll('.q').length;
+document.querySelectorAll('.q').forEach(q => {
+  const ans = +q.dataset.a;
+  q.querySelectorAll('.opt').forEach((o, i) => {
+    o.onclick = () => {
+      if (q.dataset.locked) return;
+      q.dataset.locked = 1;
+      o.classList.add(i === ans ? 'right' : 'wrong');
+      if (i !== ans) q.querySelectorAll('.opt')[ans].classList.add('right');
+      if (i === ans) score++;
+      if (++done === total) {
+        document.getElementById('result').textContent =
+          `Score: ${score} / ${total} ${score === total ? 'Perfect! You have fully mastered this history.' : 'Thanks for visiting, welcome back anytime.'}`;
+      }
+    };
+  });
+});
+</script>
+</body>
+</html>
